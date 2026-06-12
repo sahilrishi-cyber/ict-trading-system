@@ -1,0 +1,1987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICT Sniper System — BTC & Gold</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #080c12;
+    --bg2: #0d1420;
+    --bg3: #111c2e;
+    --border: #1e2d45;
+    --gold: #f0b429;
+    --gold2: #ffd166;
+    --btc: #f7931a;
+    --bull: #00d084;
+    --bear: #ff4757;
+    --blue: #3d9eff;
+    --text: #e8edf5;
+    --muted: #5a7080;
+    --card: #0f1923;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #080c12 0%, #0d1a2e 50%, #080c12 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--btc));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--bull);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .live-dot::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--bull);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* NAV TABS */
+  .nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+
+  .nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    padding: 0 8px;
+  }
+
+  .tab {
+    padding: 12px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 16px 80px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .icon {
+    font-size: 14px;
+  }
+
+  /* HERO STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* BIAS METER */
+  .bias-container {
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .bias-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .bias-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bias-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .bias-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+  }
+
+  /* ACCORDION */
+  .accordion-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .accordion-header {
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg3);
+    transition: background 0.2s;
+  }
+
+  .accordion-header:hover { background: var(--bg2); }
+
+  .accordion-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .acc-icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .acc-title {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .acc-tag {
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  .acc-arrow {
+    color: var(--muted);
+    transition: transform 0.3s;
+    font-size: 12px;
+  }
+
+  .accordion-item.open .acc-arrow { transform: rotate(180deg); }
+
+  .accordion-body {
+    display: none;
+    padding: 16px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+  }
+
+  .accordion-item.open .accordion-body { display: block; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: #060a10;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #a8c4d4;
+    margin: 10px 0;
+    overflow-x: auto;
+  }
+
+  .code-block .hl-gold { color: var(--gold); }
+  .code-block .hl-bull { color: var(--bull); }
+  .code-block .hl-bear { color: var(--bear); }
+  .code-block .hl-blue { color: var(--blue); }
+  .code-block .hl-btc { color: var(--btc); }
+
+  /* CHECKLIST */
+  .checklist {
+    list-style: none;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .check-item:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .check-item.checked .check-box {
+    background: var(--bull);
+    border-color: var(--bull);
+  }
+
+  .check-item.checked .check-box::after {
+    content: '✓';
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .check-text {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .check-item.checked .check-text {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .check-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* CALCULATOR */
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .input-group label {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .input-group input, .input-group select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-group input:focus, .input-group select:focus {
+    border-color: var(--gold);
+  }
+
+  .calc-result {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .result-row:last-child { border-bottom: none; }
+
+  .result-label { color: var(--muted); font-size: 12px; }
+  .result-val {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+  }
+
+  /* JOURNAL */
+  .journal-form {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-gold {
+    background: var(--gold);
+    color: #000;
+  }
+  .btn-gold:hover { background: var(--gold2); }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  .btn-danger {
+    background: transparent;
+    border: 1px solid var(--bear);
+    color: var(--bear);
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .trade-card {
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--border);
+  }
+
+  .trade-card.win { border-left-color: var(--bull); }
+  .trade-card.loss { border-left-color: var(--bear); }
+  .trade-card.be { border-left-color: var(--gold); }
+
+  .trade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .trade-pair {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .trade-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .badge-win { background: rgba(0,208,132,0.15); color: var(--bull); }
+  .badge-loss { background: rgba(255,71,87,0.15); color: var(--bear); }
+  .badge-be { background: rgba(240,180,41,0.15); color: var(--gold); }
+  .badge-long { background: rgba(61,158,255,0.15); color: var(--blue); }
+  .badge-short { background: rgba(255,71,87,0.15); color: var(--bear); }
+
+  .trade-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .trade-detail-item {
+    text-align: center;
+  }
+
+  .detail-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .detail-label {
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* PSYCHOLOGY */
+  .psych-meter {
+    margin-bottom: 16px;
+  }
+
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .mood-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mood-btn:hover { border-color: var(--gold); }
+  .mood-btn.active { border-color: var(--gold); background: rgba(240,180,41,0.1); }
+
+  .mood-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+  .mood-label { font-size: 9px; color: var(--muted); }
+
+  .rule-check {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rule-text { font-size: 13px; }
+  .toggle {
+    width: 40px; height: 22px;
+    background: var(--border);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle.on { background: var(--bull); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: left 0.2s;
+  }
+
+  .toggle.on::after { left: 21px; }
+
+  /* SNIPER MODEL */
+  .step-flow {
+    position: relative;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+
+  .step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .step-num {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .step-line {
+    width: 1px;
+    flex: 1;
+    min-height: 20px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  .step-content {
+    padding-bottom: 20px;
+    flex: 1;
+  }
+
+  .step-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .step-desc {
+    font-size: 12px;
+    color: #8a9bb0;
+    line-height: 1.6;
+  }
+
+  /* TAGS */
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    margin: 2px;
+  }
+
+  .tag-bull { background: rgba(0,208,132,0.15); color: var(--bull); }
+  .tag-bear { background: rgba(255,71,87,0.15); color: var(--bear); }
+  .tag-gold { background: rgba(240,180,41,0.15); color: var(--gold); }
+  .tag-blue { background: rgba(61,158,255,0.15); color: var(--blue); }
+  .tag-btc { background: rgba(247,147,26,0.15); color: var(--btc); }
+
+  /* SESSIONS */
+  .session-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .session-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .session-info { flex: 1; }
+  .session-name { font-size: 13px; font-weight: 600; }
+  .session-time { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .session-power {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    outline: none;
+    resize: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--gold); }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+  }
+
+  .empty-state .empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .empty-state p { font-size: 13px; }
+
+  .pair-toggle {
+    display: flex;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .pair-btn {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .pair-btn.active-btc { background: rgba(247,147,26,0.2); color: var(--btc); }
+  .pair-btn.active-gold { background: rgba(240,180,41,0.2); color: var(--gold); }
+
+  .news-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .news-impact {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 4px;
+  }
+
+  .impact-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .impact-dot.filled { background: var(--bear); }
+
+  .news-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .news-desc { font-size: 11px; color: var(--muted); }
+
+  .info-text {
+    font-size: 12px;
+    color: #8a9bb0;
+    line-height: 1.7;
+    margin: 8px 0;
+  }
+
+  .highlight-box {
+    background: rgba(240,180,41,0.06);
+    border: 1px solid rgba(240,180,41,0.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 10px 0;
+  }
+
+  .highlight-box p {
+    font-size: 12px;
+    color: var(--gold2);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">⚡ ICT SNIPER</div>
+    <div class="live-dot">SYSTEM ACTIVE</div>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="tab" onclick="switchTab('framework')">Framework</div>
+    <div class="tab" onclick="switchTab('model')">Sniper Model</div>
+    <div class="tab" onclick="switchTab('calculator')">Risk Calc</div>
+    <div class="tab" onclick="switchTab('journal')">Journal</div>
+    <div class="tab" onclick="switchTab('psychology')">Psychology</div>
+    <div class="tab" onclick="switchTab('news')">News Guide</div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="section active">
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-val" id="total-trades" style="color: var(--blue)">0</div>
+        <div class="stat-label">Total Trades</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="win-rate" style="color: var(--bull)">0%</div>
+        <div class="stat-label">Win Rate</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="total-rr" style="color: var(--gold)">0</div>
+        <div class="stat-label">Total R</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📊</span> Market Bias Tracker</div>
+
+      <div class="bias-container">
+        <div class="bias-label">BTC Bias</div>
+        <div style="display:flex; gap:8px; margin-bottom:6px;">
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 12px;" onclick="setBias('btc', 'bull')">🟢 Bullish</button>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 12px;" onclick="setBias('btc', 'bear')">🔴 Bearish</button>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 12px;" onclick="setBias('btc', 'neutral')">⚪ Neutral</button>
+        </div>
+        <div id="btc-bias-display" style="font-size:12px; color:var(--muted)">Not set</div>
+      </div>
+
+      <div class="bias-container">
+        <div class="bias-label">GOLD Bias</div>
+        <div style="display:flex; gap:8px; margin-bottom:6px;">
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 12px;" onclick="setBias('gold', 'bull')">🟢 Bullish</button>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 12px;" onclick="setBias('gold', 'bear')">🔴 Bearish</button>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 12px;" onclick="setBias('gold', 'neutral')">⚪ Neutral</button>
+        </div>
+        <div id="gold-bias-display" style="font-size:12px; color:var(--muted)">Not set</div>
+      </div>
+
+      <div class="bias-container" style="margin-bottom:0">
+        <div class="bias-label">DXY Direction (affects Gold inversely)</div>
+        <div style="display:flex; gap:8px; margin-bottom:6px;">
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 12px;" onclick="setBias('dxy', 'bull')">📈 DXY Up</button>
+          <button class="btn btn-outline" style="font-size:11px; padding:5px 12px;" onclick="setBias('dxy', 'bear')">📉 DXY Down</button>
+        </div>
+        <div id="dxy-bias-display" style="font-size:12px; color:var(--muted)">Not set</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🕐</span> Kill Zones — IST Time</div>
+      <div class="session-row">
+        <div class="session-dot" style="background:#3d9eff"></div>
+        <div class="session-info">
+          <div class="session-name">London Open</div>
+          <div class="session-time">1:30 PM – 4:00 PM IST</div>
+        </div>
+        <div class="session-power tag tag-blue">🔥🔥🔥</div>
+      </div>
+      <div class="session-row">
+        <div class="session-dot" style="background:#f0b429"></div>
+        <div class="session-info">
+          <div class="session-name">NY Open</div>
+          <div class="session-time">6:30 PM – 9:00 PM IST</div>
+        </div>
+        <div class="session-power tag tag-gold">🔥🔥🔥</div>
+      </div>
+      <div class="session-row">
+        <div class="session-dot" style="background:#00d084"></div>
+        <div class="session-info">
+          <div class="session-name">London Close / NY Mid</div>
+          <div class="session-time">9:00 PM – 11:30 PM IST</div>
+        </div>
+        <div class="session-power tag tag-bull">🔥🔥</div>
+      </div>
+      <div class="session-row" style="border:none">
+        <div class="session-dot" style="background:var(--muted)"></div>
+        <div class="session-info">
+          <div class="session-name">Asian Session (BTC only)</div>
+          <div class="session-time">5:00 AM – 10:00 AM IST</div>
+        </div>
+        <div class="session-power tag tag-blue">BTC 🔥</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span> Daily Pre-Trade Checklist</div>
+      <ul class="checklist" id="daily-checklist">
+        <li class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div><div class="check-text">DXY direction check karo</div><div class="check-sub">Investing.com → DXY chart</div></div>
+        </li>
+        <li class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div><div class="check-text">Economic calendar check</div><div class="check-sub">High impact events note karo</div></div>
+        </li>
+        <li class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div><div class="check-text">HTF market structure update</div><div class="check-sub">Daily/4H — Bullish ya Bearish?</div></div>
+        </li>
+        <li class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div><div class="check-text">Liquidity levels mark karo</div><div class="check-sub">BSL (equal highs) + SSL (equal lows)</div></div>
+        </li>
+        <li class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div><div class="check-text">OB/FVG zones identify karo</div><div class="check-sub">4H pe fresh zones mark karo</div></div>
+        </li>
+        <li class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div><div class="check-text">Kill zone ka wait karo</div><div class="check-sub">Sirf London/NY open pe trade</div></div>
+        </li>
+        <li class="check-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <div><div class="check-text">Daily loss limit set hai?</div><div class="check-sub">Max 3% account loss today</div></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FRAMEWORK -->
+  <section id="framework" class="section">
+    <div class="section-title">ICT Core Framework — All Pillars</div>
+
+    <div class="accordion-item open">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left">
+          <div class="acc-icon" style="background:rgba(61,158,255,0.15)">🏗️</div>
+          <div>
+            <div class="acc-title">Market Structure</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="acc-tag tag-blue">PILLAR 1</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+      </div>
+      <div class="accordion-body">
+        <div class="info-text">Market structure samajhna sabse pehla step hai. Bina structure ke koi entry nahi.</div>
+        <div class="code-block">
+<span class="hl-bull">BULLISH STRUCTURE</span>
+Higher High (HH) + Higher Low (HL)
+→ Price ooncha ja raha hai, buy bias
+
+<span class="hl-bear">BEARISH STRUCTURE</span>
+Lower Low (LL) + Lower High (LH)
+→ Price neeche ja raha hai, sell bias
+
+<span class="hl-gold">BOS — Break of Structure</span>
+Trend continue hoga signal
+Previous high/low toota = BOS
+
+<span class="hl-btc">CHOCH — Change of Character</span>
+Trend reverse hone ki warning ⚠️
+Opposite structure break = CHOCH
+        </div>
+        <div class="highlight-box"><p>🎯 Rule: Hamesha HTF structure ke direction mein trade lo. Daily bullish hai toh 4H pe bhi buy setups dhundo.</p></div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left">
+          <div class="acc-icon" style="background:rgba(0,208,132,0.15)">💧</div>
+          <div><div class="acc-title">Liquidity Concepts</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="acc-tag tag-bull">PILLAR 2</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+      </div>
+      <div class="accordion-body">
+        <div class="info-text">Yeh ICT ka heart hai. Banks retail traders ke stop losses use karte hain apne orders fill karne ke liye.</div>
+        <div class="code-block">
+<span class="hl-bull">BSL — Buy Side Liquidity</span>
+Equal highs ke upar = Short sellers ke SL
+Banks price upar le jaate hain → grab karte hain
+Fir sell karte hain wahan se 📉
+
+<span class="hl-bear">SSL — Sell Side Liquidity</span>
+Equal lows ke neeche = Long buyers ke SL
+Banks price neeche le jaate hain → grab karte hain
+Fir buy karte hain wahan se 📈
+
+<span class="hl-gold">INDUCEMENT</span>
+Fake move to attract retail traders
+Price quickly reverses after grab
+= Classic bank manipulation
+        </div>
+        <div class="highlight-box"><p>🎯 Jab price equal highs/lows ke paas aaye toh alert ho jao. Liquidity grab ke baad reversal trade lo — yeh sabse powerful setup hai.</p></div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left">
+          <div class="acc-icon" style="background:rgba(240,180,41,0.15)">📐</div>
+          <div><div class="acc-title">PD Arrays — Premium & Discount</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="acc-tag tag-gold">PILLAR 3</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+      </div>
+      <div class="accordion-body">
+        <div class="info-text">Price range ke andar positioning samajhna. Hamesha discount mein buy karo, premium mein sell karo.</div>
+        <div class="code-block">
+<span class="hl-gold">EQUILIBRIUM (EQ) = 50% level</span>
+
+Range = Swing High se Swing Low tak
+50% ke upar  = PREMIUM  → Sell zone
+50% ke neeche = DISCOUNT → Buy zone
+
+<span class="hl-bull">BULLISH TRADE</span>
+Market bullish + Price in Discount
+= High probability BUY ✅
+
+<span class="hl-bear">BEARISH TRADE</span>
+Market bearish + Price in Premium
+= High probability SELL ✅
+
+Use Fibonacci 0 to 1
+0.5 = EQ, above = premium, below = discount
+        </div>
+        <div class="highlight-box"><p>🎯 Kabhi bhi premium mein buy aur discount mein sell mat karo. Retail traders yahi mistake karte hain.</p></div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left">
+          <div class="acc-icon" style="background:rgba(247,147,26,0.15)">🧱</div>
+          <div><div class="acc-title">Order Blocks (OB)</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="acc-tag tag-btc">PILLAR 4</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+      </div>
+      <div class="accordion-body">
+        <div class="info-text">Order blocks woh zones hain jahan banks ne apne orders place kiye the. Price wapas aata hai unhe fill karne.</div>
+        <div class="code-block">
+<span class="hl-bull">BULLISH ORDER BLOCK</span>
+Last bearish candle before a big bullish move
+= Bank buying was here
+Price wapas aye = BUY opportunity
+
+<span class="hl-bear">BEARISH ORDER BLOCK</span>
+Last bullish candle before a big bearish move
+= Bank selling was here
+Price wapas aye = SELL opportunity
+
+<span class="hl-gold">OB STRENGTH</span>
+Fresh OB > Used OB
+OB + FVG overlap = Very strong
+OB + S/R = Confluence = High probability
+
+<span class="hl-blue">MITIGATION</span>
+Jab price OB pe touch kare = Mitigated
+After mitigation, OB weaker ho jaata hai
+        </div>
+        <div class="highlight-box"><p>🎯 OB + Discount zone + Liquidity grab = ICT ki best entry. Yeh teen cheezein ek jagah milein toh sniper shot ready hai.</p></div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left">
+          <div class="acc-icon" style="background:rgba(61,158,255,0.15)">🌊</div>
+          <div><div class="acc-title">Order Flow</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="acc-tag tag-blue">PILLAR 5</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+      </div>
+      <div class="accordion-body">
+        <div class="info-text">Candle by candle price ka behavior padhna. Kaise move kar raha hai — strong ya weak?</div>
+        <div class="code-block">
+<span class="hl-bull">BULLISH ORDER FLOW</span>
+✅ Strong bullish candles (big body)
+✅ Chhote pullbacks
+✅ Pullbacks OB/FVG pe respected
+✅ Lows protected (no SSL grab)
+
+<span class="hl-bear">BEARISH ORDER FLOW</span>
+✅ Strong bearish candles
+✅ Chhote bounces
+✅ Bounces OB/FVG pe rejected
+✅ Highs protected (no BSL grab)
+
+<span class="hl-gold">ORDER FLOW SHIFT</span>
+Strong bearish → Strong bullish engulfing
+= Early reversal signal ⚠️
+Wait for structure confirmation
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <div class="accordion-header" onclick="toggleAccordion(this)">
+        <div class="accordion-header-left">
+          <div class="acc-icon" style="background:rgba(0,208,132,0.15)">🕳️</div>
+          <div><div class="acc-title">Fair Value Gaps (FVG)</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="acc-tag tag-bull">PILLAR 6</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+      </div>
+      <div class="accordion-body">
+        <div class="info-text">Price jahan se bahut fast move hua wahan gap hoti hai. Price wapas aata hai us gap ko fill karne.</div>
+        <div class="code-block">
+<span class="hl-gold">FVG STRUCTURE (3 candles)</span>
+Candle 1 → Candle 2 (big move) → Candle 3
+
+<span class="hl-bull">BULLISH FVG</span>
+Gap between: Candle 1 HIGH &amp; Candle 3 LOW
+Price pullback into this zone = BUY ✅
+
+<span class="hl-bear">BEARISH FVG</span>
+Gap between: Candle 1 LOW &amp; Candle 3 HIGH
+Price bounce into this zone = SELL ✅
+
+<span class="hl-blue">IFVG — Inversion FVG</span>
+Price fully fills FVG then reverses
+Used zone becomes opposite signal
+FVG + OB overlap = Strongest version
+        </div>
+        <div class="highlight-box"><p>🎯 Fresh FVG strongest hoti hai. Pehli baar touch pe entry lo. Ek baar fill ho gayi toh uss zone ko delete karo chart se.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SNIPER MODEL -->
+  <section id="model" class="section">
+    <div class="section-title">BTC & Gold — Complete Sniper Execution Model</div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🎯</span> 5-Step Execution Framework</div>
+      <div class="step-flow">
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num" style="background:rgba(61,158,255,0.2);color:var(--blue)">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--blue)">BIAS — Daily/Weekly Analysis</div>
+            <div class="step-desc">Market structure bullish ya bearish? DXY kahan hai? (Gold ke liye). BTC dominance check karo. Weekly high/low mark karo. Yeh toh sirf ek direction deta hai — buy only ya sell only for the day.</div>
+            <div style="margin-top:8px">
+              <span class="tag tag-gold">Daily Chart</span>
+              <span class="tag tag-blue">4H Chart</span>
+              <span class="tag tag-bull">DXY Check</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num" style="background:rgba(0,208,132,0.2);color:var(--bull)">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--bull)">DRAW ON LIQUIDITY — 4H Map</div>
+            <div class="step-desc">Price kis side ki liquidity hunt karega? BSL (equal highs) ya SSL (equal lows)? Premium ya Discount zone mein hai price? Yahan tujhe pata chalta hai price KAHAN jaayega.</div>
+            <div style="margin-top:8px">
+              <span class="tag tag-bull">Equal Highs (BSL)</span>
+              <span class="tag tag-bear">Equal Lows (SSL)</span>
+              <span class="tag tag-gold">Premium/Discount</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num" style="background:rgba(240,180,41,0.2);color:var(--gold)">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--gold)">KILL ZONE — Timing</div>
+            <div class="step-desc">Sirf London Open (1:30 PM IST) ya NY Open (6:30 PM IST) pe trade karo. Inhi windows mein institutional activity hoti hai. Random time pe entry mat lo.</div>
+            <div style="margin-top:8px">
+              <span class="tag tag-blue">London 1:30 PM</span>
+              <span class="tag tag-gold">NY 6:30 PM</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num" style="background:rgba(247,147,26,0.2);color:var(--btc)">4</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--btc)">ENTRY TRIGGER — 15min/5min</div>
+            <div class="step-desc">Price ne OB ya FVG zone enter kiya? MSS (market structure shift) hua lower timeframe pe? Liquidity grab hua? Confirmation candle bani? Yeh sab hone ke baad hi entry.</div>
+            <div style="margin-top:8px">
+              <span class="tag tag-btc">OB/FVG Touch</span>
+              <span class="tag tag-bull">MSS Confirm</span>
+              <span class="tag tag-bear">Liq Grab</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-left">
+            <div class="step-num" style="background:rgba(255,71,87,0.2);color:var(--bear)">5</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title" style="color:var(--bear)">EXECUTION — Entry, SL, TP</div>
+            <div class="step-desc">Confirmation candle close ke baad entry. SL = OB ke neeche/upar (5 points buffer). TP1 = next FVG. TP2 = next OB. TP3 = Draw on Liquidity (BSL/SSL). Partial profits lo.</div>
+            <div class="code-block" style="margin-top:10px">
+<span class="hl-bull">ENTRY</span> = After confirmation candle close
+<span class="hl-bear">SL</span>    = OB low/high ± buffer
+<span class="hl-gold">TP1</span>   = 1:2 RR → 50% close + SL to BE
+<span class="hl-blue">TP2</span>   = 1:3-4 RR → 30% close
+<span class="hl-btc">TP3</span>   = 1:5+ RR → 20% let run
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🥇</span> Gold Trade Example (XAUUSD)</div>
+      <div class="code-block">
+<span class="hl-gold">SETUP: London Open Sell</span>
+
+Daily Analysis:
+├── Structure: Bearish (LH + LL forming)
+├── DXY: Bullish → Gold bearish bias ✅
+└── BSL at: 2,385 (equal highs from last week)
+
+4H Map:
+├── Price in PREMIUM zone (above 50%)
+├── Bearish OB identified: 2,362–2,368
+└── FVG just below OB: 2,358–2,362
+
+London Open (1:30 PM IST):
+├── Price rallies to OB zone 2,364
+├── BSL grab (wick above equal highs)
+├── 15min: Bearish MSS confirmed
+└── 5min: Bearish FVG formed
+
+<span class="hl-bear">TRADE EXECUTION</span>
+Entry  : 2,362
+SL     : 2,372  (10 points above OB)
+TP1    : 2,342  (20pts — RR 1:2) → 50% close
+TP2    : 2,322  (40pts — RR 1:4) → 30% close
+TP3    : 2,295  (SSL target — RR 1:6.7) → 20%
+
+<span class="hl-bull">RESULT: TP2 hit → SL to BE → TP3 running 🎯</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">₿</span> BTC Trade Example</div>
+      <div class="code-block">
+<span class="hl-btc">SETUP: NY Open Buy</span>
+
+Daily Analysis:
+├── Structure: Bullish (HH + HL intact)
+├── BTC dominance: Rising ✅
+└── SSL at: 61,500 (equal lows last 3 days)
+
+4H Map:
+├── Price in DISCOUNT zone (below 50%)
+├── Bullish OB: 62,000–62,800
+├── FVG inside OB: 62,200–62,600
+└── SSL just below: 61,500
+
+NY Open (6:30 PM IST):
+├── Price drops to 62,100 (OB zone)
+├── SSL grab (wick to 61,480)
+├── Strong bullish reversal candle
+└── 15min MSS: Higher low formed
+
+<span class="hl-bull">TRADE EXECUTION</span>
+Entry  : 62,300
+SL     : 61,400  (below SSL grab)
+TP1    : 64,100  (RR 1:2) → 50% close
+TP2    : 66,300  (RR 1:4.4) → 30% close
+TP3    : 70,000  (BSL — RR 1:8.5) → 20%
+
+<span class="hl-gold">RESULT: Clean RR 1:4+ trade ✅</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RISK CALCULATOR -->
+  <section id="calculator" class="section">
+    <div class="section-title">Position Size & Risk Calculator</div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🧮</span> Trade Risk Calculator</div>
+
+      <div class="pair-toggle">
+        <div class="pair-btn active-gold" id="pair-gold" onclick="selectPair('gold')">🥇 GOLD</div>
+        <div class="pair-btn" id="pair-btc" onclick="selectPair('btc')">₿ BTC</div>
+        <div class="pair-btn" id="pair-forex" onclick="selectPair('forex')">💱 FOREX</div>
+      </div>
+
+      <div class="calc-grid">
+        <div class="input-group">
+          <label>Account Balance ($)</label>
+          <input type="number" id="account" value="1000" oninput="calcRisk()">
+        </div>
+        <div class="input-group">
+          <label>Risk % per trade</label>
+          <input type="number" id="risk-pct" value="1" step="0.1" oninput="calcRisk()">
+        </div>
+        <div class="input-group">
+          <label>Entry Price</label>
+          <input type="number" id="entry-price" value="2350" oninput="calcRisk()">
+        </div>
+        <div class="input-group">
+          <label>Stop Loss Price</label>
+          <input type="number" id="sl-price" value="2340" oninput="calcRisk()">
+        </div>
+        <div class="input-group">
+          <label>TP1 Price</label>
+          <input type="number" id="tp1-price" value="2370" oninput="calcRisk()">
+        </div>
+        <div class="input-group">
+          <label>TP2 Price</label>
+          <input type="number" id="tp2-price" value="2390" oninput="calcRisk()">
+        </div>
+      </div>
+
+      <div class="calc-result">
+        <div class="result-row">
+          <span class="result-label">Risk Amount</span>
+          <span class="result-val" id="risk-amt" style="color:var(--bear)">$0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">SL Distance</span>
+          <span class="result-val" id="sl-dist" style="color:var(--muted)">0 pts</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Suggested Lot Size</span>
+          <span class="result-val" id="lot-size" style="color:var(--gold)">0.00 lots</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">RR Ratio (TP1)</span>
+          <span class="result-val" id="rr1" style="color:var(--blue)">1:0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">RR Ratio (TP2)</span>
+          <span class="result-val" id="rr2" style="color:var(--blue)">1:0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Potential Profit (TP2)</span>
+          <span class="result-val" id="profit" style="color:var(--bull)">$0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Trade Quality</span>
+          <span class="result-val" id="quality">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🛡️</span> Risk Rules</div>
+      <div class="code-block">
+<span class="hl-gold">ACCOUNT PROTECTION RULES</span>
+
+Max risk per trade    = 1% account
+Daily max loss        = 3% account  
+Weekly max loss       = 5% account
+
+<span class="hl-bull">MINIMUM ACCEPTABLE RR</span>
+Entry lene se pehle RR check karo:
+Below 1:2  = ❌ Skip this trade
+1:2 – 1:3  = ✅ Acceptable
+1:3 – 1:5  = 🎯 Good setup
+Above 1:5  = 🔥 ICT sniper grade
+
+<span class="hl-bear">HARD RULES</span>
+3 consecutive losses   = Band for the day
+Hit daily 3% limit     = Close all trades
+Never move SL to loss  = Capital protection
+Always partial profits = Lock in gains
+      </div>
+    </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section id="journal" class="section">
+    <div class="section-title">Trade Journal</div>
+
+    <div class="journal-form">
+      <div class="card-title" style="margin-bottom:12px"><span class="icon">➕</span> Log New Trade</div>
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Asset</label>
+          <select id="j-pair">
+            <option value="XAUUSD">🥇 GOLD (XAUUSD)</option>
+            <option value="BTCUSD">₿ BTC/USD</option>
+            <option value="EURUSD">💱 EUR/USD</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Direction</label>
+          <select id="j-dir">
+            <option value="LONG">📈 Long (Buy)</option>
+            <option value="SHORT">📉 Short (Sell)</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Entry Price</label>
+          <input type="number" id="j-entry" placeholder="2350">
+        </div>
+        <div class="input-group">
+          <label>Stop Loss</label>
+          <input type="number" id="j-sl" placeholder="2340">
+        </div>
+        <div class="input-group">
+          <label>Take Profit</label>
+          <input type="number" id="j-tp" placeholder="2380">
+        </div>
+        <div class="input-group">
+          <label>Result</label>
+          <select id="j-result">
+            <option value="WIN">✅ Win</option>
+            <option value="LOSS">❌ Loss</option>
+            <option value="BE">⚪ Break Even</option>
+            <option value="OPEN">🟡 Open</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group" style="margin-bottom:12px">
+        <label>Setup Used</label>
+        <select id="j-setup">
+          <option value="OB + FVG">Order Block + FVG</option>
+          <option value="Liq Grab + OB">Liquidity Grab + OB</option>
+          <option value="CHOCH + OB">CHOCH + OB</option>
+          <option value="FVG Only">FVG Only</option>
+          <option value="BOS Retest">BOS Retest</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="input-group" style="margin-bottom:14px">
+        <label>Notes / Lesson</label>
+        <textarea id="j-notes" rows="2" placeholder="Kya sahi kiya? Kya galat hua? Kya sikha?"></textarea>
+      </div>
+      <button class="btn btn-gold" onclick="addTrade()">+ Log Trade</button>
+    </div>
+
+    <div id="trades-container">
+      <div class="empty-state">
+        <div class="empty-icon">📒</div>
+        <p>Abhi koi trade log nahi hai.<br>Pehla trade log karo!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PSYCHOLOGY -->
+  <section id="psychology" class="section">
+    <div class="section-title">Trading Psychology Tracker</div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🧠</span> Aaj ka Mental State</div>
+      <div class="mood-grid">
+        <div class="mood-btn" onclick="selectMood(this, 'Focused')">
+          <span class="mood-emoji">🎯</span>
+          <span class="mood-label">Focused</span>
+        </div>
+        <div class="mood-btn" onclick="selectMood(this, 'Calm')">
+          <span class="mood-emoji">😌</span>
+          <span class="mood-label">Calm</span>
+        </div>
+        <div class="mood-btn" onclick="selectMood(this, 'Anxious')">
+          <span class="mood-emoji">😰</span>
+          <span class="mood-label">Anxious</span>
+        </div>
+        <div class="mood-btn" onclick="selectMood(this, 'Greedy')">
+          <span class="mood-emoji">🤑</span>
+          <span class="mood-label">Greedy</span>
+        </div>
+        <div class="mood-btn" onclick="selectMood(this, 'Revenge')">
+          <span class="mood-emoji">😡</span>
+          <span class="mood-label">Revenge</span>
+        </div>
+      </div>
+      <div id="mood-advice" class="highlight-box" style="display:none">
+        <p id="mood-text"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📜</span> Pre-Trade Rules Checklist</div>
+      <div class="rule-check">
+        <span class="rule-text">Mera HTF bias clear hai</span>
+        <div class="toggle" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="rule-check">
+        <span class="rule-text">Kill zone mein hoon abhi</span>
+        <div class="toggle" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="rule-check">
+        <span class="rule-text">RR minimum 1:2 hai</span>
+        <div class="toggle" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="rule-check">
+        <span class="rule-text">SL already set hai</span>
+        <div class="toggle" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="rule-check">
+        <span class="rule-text">Daily loss limit nahi toota</span>
+        <div class="toggle" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="rule-check">
+        <span class="rule-text">Revenge mood mein nahi hoon</span>
+        <div class="toggle" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="rule-check" style="border:none">
+        <span class="rule-text">Yeh setup meri checklist follow karta hai</span>
+        <div class="toggle" onclick="toggleSwitch(this)"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⚠️</span> The 4 Enemies of a Trader</div>
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="background:rgba(255,71,87,0.05)">
+          <div class="accordion-header-left">
+            <div class="acc-icon" style="background:rgba(255,71,87,0.15)">😰</div>
+            <div class="acc-title">FOMO — Fear of Missing Out</div>
+          </div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p class="info-text">Price already move kar chuka hai, tujhe lag raha hai miss ho jaayega. Tum bina setup ke late entry lo. Yahi account killer hai.</p>
+          <div class="highlight-box"><p>💊 Fix: "Ek trade miss hua toh koi baat nahi. Market kal bhi khulega. Mera setup aayega."</p></div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="background:rgba(255,71,87,0.05)">
+          <div class="accordion-header-left">
+            <div class="acc-icon" style="background:rgba(255,71,87,0.15)">😡</div>
+            <div class="acc-title">Revenge Trading</div>
+          </div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p class="info-text">Loss aaya, gussa aaya, bada trade liya wapas nikalne ke liye. Result? Aur bada loss.</p>
+          <div class="highlight-box"><p>💊 Fix: 2 consecutive losses = 30 min break mandatory. 3 losses = day band. No exceptions.</p></div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="background:rgba(255,71,87,0.05)">
+          <div class="accordion-header-left">
+            <div class="acc-icon" style="background:rgba(255,71,87,0.15)">🤑</div>
+            <div class="acc-title">Greed — TP Hit ke Baad Bhi Hold</div>
+          </div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p class="info-text">TP1 hit hua, thoda aur chahiye. TP2 bhi, ab TP3 chahiye. Fir reversal — sab wapas chala gaya.</p>
+          <div class="highlight-box"><p>💊 Fix: Plan pehle banao. TP levels pehle set karo. TP hit hone pe partial close is non-negotiable.</p></div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion(this)" style="background:rgba(255,71,87,0.05)" style="border:none">
+          <div class="accordion-header-left">
+            <div class="acc-icon" style="background:rgba(255,71,87,0.15)">🙏</div>
+            <div class="acc-title">Hope — SL Remove Karna</div>
+          </div>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <p class="info-text">"Wapas aayega" — yeh ek sentence ne traders ko barbad kiya hai. SL remove karna = account blow.</p>
+          <div class="highlight-box"><p>💊 Fix: SL = insurance policy. Kabhi remove mat karo. Loss ek chhota kharcha hai, SL nahi lagana ek bada disaster hai.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWS GUIDE -->
+  <section id="news" class="section">
+    <div class="section-title">News Trading Guide — BTC & Gold</div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📅</span> High Impact Events</div>
+
+      <div class="news-item">
+        <div class="news-impact">
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot filled"></div>
+        </div>
+        <div class="news-title">US CPI — Consumer Price Index</div>
+        <div class="news-desc">Gold pe sabse bada impact. Inflation data. High CPI = Gold up / Dollar confusion. Low CPI = Gold down.</div>
+        <div style="margin-top:6px"><span class="tag tag-gold">Gold 🔥🔥🔥</span><span class="tag tag-btc">BTC 🔥🔥</span></div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-impact">
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot filled"></div>
+        </div>
+        <div class="news-title">FOMC — Fed Rate Decision</div>
+        <div class="news-desc">Federal Reserve interest rate decision. Rate up = Dollar up = Gold down. Rate down = Gold up. Market-moving event.</div>
+        <div style="margin-top:6px"><span class="tag tag-gold">Gold 🔥🔥🔥</span><span class="tag tag-btc">BTC 🔥🔥🔥</span></div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-impact">
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot filled"></div>
+        </div>
+        <div class="news-title">NFP — Non-Farm Payroll</div>
+        <div class="news-desc">US jobs data. Strong jobs = Dollar strong = Gold weak. Weak jobs = Dollar weak = Gold strong. Every first Friday of month.</div>
+        <div style="margin-top:6px"><span class="tag tag-gold">Gold 🔥🔥🔥</span><span class="tag tag-blue">Forex 🔥🔥🔥</span></div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-impact">
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot"></div>
+        </div>
+        <div class="news-title">FOMC Minutes</div>
+        <div class="news-desc">Fed meeting ke notes. Hawkish language = Dollar up = Gold down. Dovish = Gold up.</div>
+        <div style="margin-top:6px"><span class="tag tag-gold">Gold 🔥🔥</span></div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-impact">
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot filled"></div>
+          <div class="impact-dot filled"></div>
+        </div>
+        <div class="news-title">BTC ETF News / Regulatory</div>
+        <div class="news-desc">ETF approval/rejection, country bans/approvals, whale movements. BTC-specific major catalyst.</div>
+        <div style="margin-top:6px"><span class="tag tag-btc">BTC 🔥🔥🔥</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🎯</span> News Trading Protocol</div>
+      <div class="code-block">
+<span class="hl-gold">BEFORE NEWS (30 min)</span>
+❌ No new trades
+❌ Existing trades mein SL tight karo ya close
+✅ News event note karo
+✅ Expected direction samjho
+
+<span class="hl-bear">DURING NEWS (0–5 min)</span>
+❌ Bilkul mat trade karo
+❌ Spreads bahut wide ho jaate hain
+❌ Slippage risk bahut high
+✅ Sirf dekho, samjho
+
+<span class="hl-bull">AFTER NEWS (5–15 min)</span>
+✅ Volatility settle hone do
+✅ Initial spike often reverses
+✅ Real direction 10-15 min baad clear
+✅ Fir ICT setup dhundo news direction mein
+
+<span class="hl-blue">PRO TIP</span>
+"Buy the rumor, sell the news"
+Expected news already priced in hoti hai
+Surprise news = biggest moves
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🔗</span> DXY — Gold Relationship</div>
+      <div class="code-block">
+<span class="hl-gold">DXY vs GOLD (Almost Always Inverse)</span>
+
+DXY ⬆️ Up   → Gold ⬇️ Down
+DXY ⬇️ Down  → Gold ⬆️ Up
+
+<span class="hl-btc">Risk Sentiment</span>
+Risk-ON  → BTC up, Gold sideways
+Risk-OFF → Gold up, BTC down
+Crisis   → Both drop, then Gold recovers
+
+<span class="hl-blue">PRACTICAL RULE</span>
+Daily chart pe DXY dekho
+DXY bearish week = Gold buy setups dhundo
+DXY bullish week = Gold sell setups dhundo
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Tab switching
+  function switchTab(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Accordion
+  function toggleAccordion(header) {
+    const item = header.parentElement;
+    item.classList.toggle('open');
+  }
+
+  // Check items
+  function toggleCheck(item) {
+    item.classList.toggle('checked');
+  }
+
+  // Toggle switch
+  function toggleSwitch(toggle) {
+    toggle.classList.toggle('on');
+  }
+
+  // Mood selector
+  const moodMessages = {
+    'Focused': { text: '🎯 Perfect state! Tum trade karne ke liye ready ho. Apna setup dhundo aur plan follow karo.', good: true },
+    'Calm': { text: '😌 Good state! Patient raho, setup ka wait karo. Calm mindset = best decisions.', good: true },
+    'Anxious': { text: '😰 Warning! Anxiety mein trade karna risky hai. Pehle deep breaths lo. Agar anxiety zyada hai toh aaj rest karo.', good: false },
+    'Greedy': { text: '🤑 Danger! Greed mode mein ho. TP levels already set hai toh stick karo. No size increase today.', good: false },
+    'Revenge': { text: '😡 STOP! Revenge mode = account blow. Aaj trading band karo. Kal fresh start karo. Market hamesha rehga.', good: false }
+  };
+
+  function selectMood(btn, mood) {
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const msg = moodMessages[mood];
+    const box = document.getElementById('mood-advice');
+    const text = document.getElementById('mood-text');
+    box.style.display = 'block';
+    box.style.borderColor = msg.good ? 'rgba(0,208,132,0.3)' : 'rgba(255,71,87,0.3)';
+    box.style.background = msg.good ? 'rgba(0,208,132,0.06)' : 'rgba(255,71,87,0.06)';
+    text.style.color = msg.good ? '#00d084' : '#ff4757';
+    text.textContent = msg.text;
+  }
+
+  // Bias
+  function setBias(asset, dir) {
+    const labels = { bull: '🟢 Bullish', bear: '🔴 Bearish', neutral: '⚪ Neutral' };
+    const colors = { bull: '#00d084', bear: '#ff4757', neutral: '#f0b429' };
+    const el = document.getElementById(asset + '-bias-display');
+    el.textContent = labels[dir];
+    el.style.color = colors[dir];
+
+    if (asset === 'dxy' && dir === 'bull') {
+      el.textContent = '📈 DXY Up → Gold likely Bearish';
+      el.style.color = '#ff4757';
+    } else if (asset === 'dxy' && dir === 'bear') {
+      el.textContent = '📉 DXY Down → Gold likely Bullish';
+      el.style.color = '#00d084';
+    }
+  }
+
+  // Pair selector
+  let selectedPair = 'gold';
+  const pairDefaults = {
+    gold: { entry: 2350, sl: 2340, tp1: 2370, tp2: 2390, pipVal: 1 },
+    btc: { entry: 65000, sl: 64000, tp1: 67000, tp2: 69000, pipVal: 1 },
+    forex: { entry: 1.0850, sl: 1.0820, tp1: 1.0910, tp2: 1.0970, pipVal: 10 }
+  };
+
+  function selectPair(pair) {
+    selectedPair = pair;
+    document.querySelectorAll('.pair-btn').forEach(b => {
+      b.className = 'pair-btn';
+    });
+    const btn = document.getElementById('pair-' + pair);
+    if (pair === 'gold') btn.classList.add('active-gold');
+    else if (pair === 'btc') btn.classList.add('active-btc');
+    else btn.classList.add('active-gold');
+
+    const d = pairDefaults[pair];
+    document.getElementById('entry-price').value = d.entry;
+    document.getElementById('sl-price').value = d.sl;
+    document.getElementById('tp1-price').value = d.tp1;
+    document.getElementById('tp2-price').value = d.tp2;
+    calcRisk();
+  }
+
+  function calcRisk() {
+    const acc = parseFloat(document.getElementById('account').value) || 0;
+    const riskPct = parseFloat(document.getElementById('risk-pct').value) || 1;
+    const entry = parseFloat(document.getElementById('entry-price').value) || 0;
+    const sl = parseFloat(document.getElementById('sl-price').value) || 0;
+    const tp1 = parseFloat(document.getElementById('tp1-price').value) || 0;
+    const tp2 = parseFloat(document.getElementById('tp2-price').value) || 0;
+
+    const riskAmt = acc * (riskPct / 100);
+    const slDist = Math.abs(entry - sl);
+    const tp1Dist = Math.abs(tp1 - entry);
+    const tp2Dist = Math.abs(tp2 - entry);
+
+    let lotSize = 0;
+    if (selectedPair === 'gold') {
+      lotSize = riskAmt / (slDist * 100);
+    } else if (selectedPair === 'btc') {
+      lotSize = riskAmt / slDist;
+    } else {
+      lotSize = riskAmt / (slDist * 100000 * 1);
+    }
+
+    const rr1 = slDist > 0 ? (tp1Dist / slDist).toFixed(1) : 0;
+    const rr2 = slDist > 0 ? (tp2Dist / slDist).toFixed(1) : 0;
+    const profit = riskAmt * parseFloat(rr2);
+
+    let quality = '—';
+    let qColor = 'var(--muted)';
+    if (rr2 >= 5) { quality = '🔥 ICT Grade'; qColor = 'var(--gold)'; }
+    else if (rr2 >= 3) { quality = '🎯 Good Setup'; qColor = 'var(--bull)'; }
+    else if (rr2 >= 2) { quality = '✅ Acceptable'; qColor = 'var(--blue)'; }
+    else { quality = '❌ Skip Trade'; qColor = 'var(--bear)'; }
+
+    document.getElementById('risk-amt').textContent = '$' + riskAmt.toFixed(2);
+    document.getElementById('sl-dist').textContent = slDist.toFixed(selectedPair === 'forex' ? 4 : 0) + (selectedPair === 'forex' ? ' pips' : ' pts');
+    document.getElementById('lot-size').textContent = lotSize.toFixed(selectedPair === 'btc' ? 4 : 2) + (selectedPair === 'btc' ? ' BTC' : ' lots');
+    document.getElementById('rr1').textContent = '1:' + rr1;
+    document.getElementById('rr2').textContent = '1:' + rr2;
+    document.getElementById('profit').textContent = '$' + profit.toFixed(2);
+    document.getElementById('quality').textContent = quality;
+    document.getElementById('quality').style.color = qColor;
+  }
+
+  // Journal
+  let trades = JSON.parse(localStorage.getItem('ict-trades') || '[]');
+
+  function addTrade() {
+    const pair = document.getElementById('j-pair').value;
+    const dir = document.getElementById('j-dir').value;
+    const entry = document.getElementById('j-entry').value;
+    const sl = document.getElementById('j-sl').value;
+    const tp = document.getElementById('j-tp').value;
+    const result = document.getElementById('j-result').value;
+    const setup = document.getElementById('j-setup').value;
+    const notes = document.getElementById('j-notes').value;
+
+    if (!entry || !sl || !tp) {
+      alert('Entry, SL aur TP fill karo!');
+      return;
+    }
+
+    const slDist = Math.abs(parseFloat(entry) - parseFloat(sl));
+    const tpDist = Math.abs(parseFloat(tp) - parseFloat(entry));
+    const rr = slDist > 0 ? (tpDist / slDist).toFixed(1) : 0;
+
+    const trade = {
+      id: Date.now(),
+      pair, dir, entry, sl, tp, result, setup, notes, rr,
+      date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+    };
+
+    trades.unshift(trade);
+    localStorage.setItem('ict-trades', JSON.stringify(trades));
+    renderTrades();
+    updateStats();
+
+    document.getElementById('j-entry').value = '';
+    document.getElementById('j-sl').value = '';
+    document.getElementById('j-tp').value = '';
+    document.getElementById('j-notes').value = '';
+  }
+
+  function deleteTrade(id) {
+    trades = trades.filter(t => t.id !== id);
+    localStorage.setItem('ict-trades', JSON.stringify(trades));
+    renderTrades();
+    updateStats();
+  }
+
+  function renderTrades() {
+    const container = document.getElementById('trades-container');
+    if (trades.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">📒</div><p>Abhi koi trade log nahi hai.<br>Pehla trade log karo!</p></div>';
+      return;
+    }
+
+    container.innerHTML = trades.map(t => {
+      const cls = t.result === 'WIN' ? 'win' : t.result === 'LOSS' ? 'loss' : t.result === 'BE' ? 'be' : '';
+      const badgeCls = t.result === 'WIN' ? 'badge-win' : t.result === 'LOSS' ? 'badge-loss' : t.result === 'BE' ? 'badge-be' : 'badge-be';
+      const dirCls = t.dir === 'LONG' ? 'badge-long' : 'badge-short';
+      return `
+        <div class="trade-card ${cls}">
+          <div class="trade-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="trade-pair">${t.pair}</span>
+              <span class="trade-badge ${dirCls}">${t.dir === 'LONG' ? '▲ LONG' : '▼ SHORT'}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span class="trade-badge ${badgeCls}">${t.result}</span>
+              <button class="btn btn-danger" onclick="deleteTrade(${t.id})">✕</button>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${t.date} • ${t.setup}</div>
+          <div class="trade-details">
+            <div class="trade-detail-item">
+              <div class="detail-val" style="color:var(--blue)">${t.entry}</div>
+              <div class="detail-label">Entry</div>
+            </div>
+            <div class="trade-detail-item">
+              <div class="detail-val" style="color:var(--bear)">${t.sl}</div>
+              <div class="detail-label">Stop Loss</div>
+            </div>
+            <div class="trade-detail-item">
+              <div class="detail-val" style="color:var(--gold)">1:${t.rr}</div>
+              <div class="detail-label">RR</div>
+            </div>
+          </div>
+          ${t.notes ? `<div style="margin-top:8px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px">💬 ${t.notes}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function updateStats() {
+    const total = trades.length;
+    const wins = trades.filter(t => t.result === 'WIN').length;
+    const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
+    const totalR = trades.reduce((sum, t) => {
+      if (t.result === 'WIN') return sum + parseFloat(t.rr || 0);
+      if (t.result === 'LOSS') return sum - 1;
+      return sum;
+    }, 0);
+
+    document.getElementById('total-trades').textContent = total;
+    document.getElementById('win-rate').textContent = winRate + '%';
+    document.getElementById('total-rr').textContent = (totalR >= 0 ? '+' : '') + totalR.toFixed(1) + 'R';
+    document.getElementById('total-rr').style.color = totalR >= 0 ? 'var(--bull)' : 'var(--bear)';
+  }
+
+  // Init
+  calcRisk();
+  renderTrades();
+  updateStats();
+</script>
+</body>
+</html>
