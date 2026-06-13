@@ -280,37 +280,29 @@ const FCS_KEY = 'Fd1u02QCNfopPM5FEkcjl6EC15CNKAWvS';
 let allNews = [];
 let currentFilter = 'all';
 
-// ============ PRICES — CoinGecko (No CORS issue) ============
+// ============ PRICES ============
 async function fetchPrices() {
   try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true`
-    );
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true');
     const data = await res.json();
-
     if (data.bitcoin) {
-      const btc = data.bitcoin;
-      const chgColor = btc.usd_24h_change >= 0 ? '#00d084' : '#ff4757';
-      const arrow = btc.usd_24h_change >= 0 ? '▲' : '▼';
-      document.getElementById('btc-price').textContent = '$' + btc.usd.toLocaleString();
-      document.getElementById('btc-chg').innerHTML = `<span style="color:${chgColor}">${arrow} ${Math.abs(btc.usd_24h_change).toFixed(2)}%</span>`;
-      const tkVal = `<span style="color:${chgColor}">${arrow}${Math.abs(btc.usd_24h_change).toFixed(1)}%</span> $${btc.usd.toLocaleString()}`;
-      document.getElementById('tk-btc').innerHTML = tkVal;
-      document.getElementById('tk-btc2').innerHTML = tkVal;
+      const b = data.bitcoin;
+      const c = b.usd_24h_change >= 0 ? '#00d084' : '#ff4757';
+      const a = b.usd_24h_change >= 0 ? '▲' : '▼';
+      document.getElementById('btc-price').textContent = '$' + b.usd.toLocaleString();
+      document.getElementById('btc-chg').innerHTML = `<span style="color:${c}">${a} ${Math.abs(b.usd_24h_change).toFixed(2)}%</span>`;
+      const tk = `<span style="color:${c}">${a}${Math.abs(b.usd_24h_change).toFixed(1)}%</span> $${b.usd.toLocaleString()}`;
+      document.getElementById('tk-btc').innerHTML = tk;
+      document.getElementById('tk-btc2').innerHTML = tk;
     }
-
     if (data.ethereum) {
-      const eth = data.ethereum;
-      const chgColor = eth.usd_24h_change >= 0 ? '#00d084' : '#ff4757';
-      const arrow = eth.usd_24h_change >= 0 ? '▲' : '▼';
-      document.getElementById('eth-price').textContent = '$' + eth.usd.toLocaleString();
-      document.getElementById('eth-chg').innerHTML = `<span style="color:${chgColor}">${arrow} ${Math.abs(eth.usd_24h_change).toFixed(2)}%</span>`;
+      const e = data.ethereum;
+      const c = e.usd_24h_change >= 0 ? '#00d084' : '#ff4757';
+      const a = e.usd_24h_change >= 0 ? '▲' : '▼';
+      document.getElementById('eth-price').textContent = '$' + e.usd.toLocaleString();
+      document.getElementById('eth-chg').innerHTML = `<span style="color:${c}">${a} ${Math.abs(e.usd_24h_change).toFixed(2)}%</span>`;
     }
-  } catch(e) {
-    console.log('CoinGecko error:', e);
-  }
-
-  // Gold + Forex via FCS
+  } catch(e) { console.log('CoinGecko err:', e); }
   fetchGoldForex();
 }
 
@@ -319,127 +311,178 @@ async function fetchGoldForex() {
     const res = await fetch(`https://fcsapi.com/api-v3/forex/latest?symbol=XAU/USD,EUR/USD,GBP/USD&access_key=${FCS_KEY}`);
     const data = await res.json();
     if (data.response) {
-      data.response.forEach(pair => {
-        const price = parseFloat(pair.c);
-        const chg = parseFloat(pair.cp);
-        const chgColor = chg >= 0 ? '#00d084' : '#ff4757';
-        const arrow = chg >= 0 ? '▲' : '▼';
-
-        if (pair.s === 'XAU/USD') {
+      data.response.forEach(p => {
+        const price = parseFloat(p.c);
+        const chg = parseFloat(p.cp);
+        const c = chg >= 0 ? '#00d084' : '#ff4757';
+        const a = chg >= 0 ? '▲' : '▼';
+        if (p.s === 'XAU/USD') {
           document.getElementById('gold-price').textContent = '$' + price.toFixed(2);
-          document.getElementById('gold-chg').innerHTML = `<span style="color:${chgColor}">${arrow} ${Math.abs(chg).toFixed(2)}%</span>`;
-          const tkG = `<span style="color:${chgColor}">${arrow}${Math.abs(chg).toFixed(1)}%</span> $${price.toFixed(2)}`;
-          document.getElementById('tk-gold').innerHTML = tkG;
-          document.getElementById('tk-gold2').innerHTML = tkG;
+          document.getElementById('gold-chg').innerHTML = `<span style="color:${c}">${a} ${Math.abs(chg).toFixed(2)}%</span>`;
+          const tk = `<span style="color:${c}">${a}${Math.abs(chg).toFixed(1)}%</span> $${price.toFixed(2)}`;
+          document.getElementById('tk-gold').innerHTML = tk;
+          document.getElementById('tk-gold2').innerHTML = tk;
         }
-        if (pair.s === 'EUR/USD') {
-          document.getElementById('tk-eur').innerHTML = `<span style="color:${chgColor}">${arrow}${Math.abs(chg).toFixed(2)}%</span> ${price.toFixed(4)}`;
-        }
-        if (pair.s === 'GBP/USD') {
-          document.getElementById('tk-gbp').innerHTML = `<span style="color:${chgColor}">${arrow}${Math.abs(chg).toFixed(2)}%</span> ${price.toFixed(4)}`;
-        }
+        if (p.s === 'EUR/USD') document.getElementById('tk-eur').innerHTML = `<span style="color:${c}">${a}${Math.abs(chg).toFixed(2)}%</span> ${price.toFixed(4)}`;
+        if (p.s === 'GBP/USD') document.getElementById('tk-gbp').innerHTML = `<span style="color:${c}">${a}${Math.abs(chg).toFixed(2)}%</span> ${price.toFixed(4)}`;
       });
     }
-  } catch(e) {
-    console.log('FCS error:', e);
-  }
+  } catch(e) { console.log('FCS err:', e); }
 }
 
-// ============ NEWS — GNews API (CORS friendly) ============
-async function fetchNews() {
-  try {
-    const queries = [
-      'gold price forex',
-      'bitcoin cryptocurrency',
-      'federal reserve inflation',
-      'forex dollar market'
-    ];
-    const q = queries[Math.floor(Date.now() / 300000) % queries.length];
+// ============ NEWS — 4 FREE SOURCES ============
 
-    const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(q)}&lang=en&country=us&max=10&apikey=${GNEWS_KEY}`;
+// SOURCE 1: GNews API
+async function fetchGNews(topic) {
+  try {
+    const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(topic)}&lang=en&max=10&apikey=${GNEWS_KEY}`;
     const res = await fetch(url);
     const data = await res.json();
-
-    if (data.articles && data.articles.length > 0) {
-      const mapped = data.articles.map((a, i) => ({
-        id: i,
-        title: a.title,
-        description: a.description || a.content || '',
-        source: a.source.name,
-        url: a.url,
-        image: a.image,
-        publishedAt: a.publishedAt,
-        impact: detectImpact(a.title + ' ' + (a.description || '')),
-        tags: detectTags(a.title + ' ' + (a.description || '')),
-        direction: detectDirection(a.title + ' ' + (a.description || '')),
-      }));
-      allNews = [...mapped, ...allNews].slice(0, 30);
-      // Remove duplicates by title
-      const seen = new Set();
-      allNews = allNews.filter(n => {
-        if (seen.has(n.title)) return false;
-        seen.add(n.title);
-        return true;
-      });
-      renderNews();
-      updateAlerts();
-      updateTimestamp();
-    } else {
-      if (allNews.length === 0) showFallbackNews();
-    }
-  } catch(e) {
-    console.log('GNews error:', e);
-    if (allNews.length === 0) showFallbackNews();
-  }
+    if (data.articles) return data.articles.map(a => ({
+      title: a.title, description: a.description || '', source: a.source.name,
+      url: a.url, publishedAt: a.publishedAt, origin: 'GNews'
+    }));
+  } catch(e) {}
+  return [];
 }
 
-// Fetch multiple topics in rotation
-async function fetchAllTopics() {
-  const topics = [
-    'gold price XAU',
-    'bitcoin BTC crypto',
-    'federal reserve dollar',
-    'forex EUR GBP market'
-  ];
-  for (const topic of topics) {
-    try {
-      const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(topic)}&lang=en&max=5&apikey=${GNEWS_KEY}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data.articles) {
-        const mapped = data.articles.map((a, i) => ({
-          id: Date.now() + i,
-          title: a.title,
-          description: a.description || '',
-          source: a.source.name,
-          url: a.url,
-          publishedAt: a.publishedAt,
-          impact: detectImpact(a.title + ' ' + (a.description || '')),
-          tags: detectTags(a.title + ' ' + (a.description || '')),
-          direction: detectDirection(a.title + ' ' + (a.description || '')),
-        }));
-        allNews = [...mapped, ...allNews];
-      }
-      await new Promise(r => setTimeout(r, 500));
-    } catch(e) {}
-  }
-  // Deduplicate
-  const seen = new Set();
-  allNews = allNews.filter(n => {
-    if (seen.has(n.title)) return false;
-    seen.add(n.title);
-    return true;
-  }).slice(0, 40);
+// SOURCE 2: RSS via rss2json (Free, no key needed)
+async function fetchRSS(rssUrl, sourceName) {
+  try {
+    const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=15`;
+    const res = await fetch(api);
+    const data = await res.json();
+    if (data.status === 'ok' && data.items) {
+      return data.items.map(item => ({
+        title: item.title,
+        description: item.description ? item.description.replace(/<[^>]*>/g, '').slice(0, 200) : '',
+        source: sourceName,
+        url: item.link,
+        publishedAt: item.pubDate,
+        origin: 'RSS'
+      }));
+    }
+  } catch(e) {}
+  return [];
+}
 
-  renderNews();
-  updateAlerts();
-  updateTimestamp();
+// SOURCE 3: CoinDesk RSS (Crypto news — Free)
+async function fetchCoinDesk() {
+  return fetchRSS('https://www.coindesk.com/arc/outboundfeeds/rss/', 'CoinDesk');
+}
+
+// SOURCE 4: Investing.com Gold RSS (Free)
+async function fetchInvestingGold() {
+  return fetchRSS('https://www.investing.com/rss/news_1.rss', 'Investing.com');
+}
+
+// SOURCE 5: MarketWatch RSS (Free)
+async function fetchMarketWatch() {
+  return fetchRSS('https://feeds.marketwatch.com/marketwatch/topstories/', 'MarketWatch');
+}
+
+// SOURCE 6: Reuters RSS (Free)
+async function fetchReuters() {
+  return fetchRSS('https://feeds.reuters.com/reuters/businessNews', 'Reuters');
+}
+
+// SOURCE 7: FXStreet RSS (Forex specific — Free)
+async function fetchFXStreet() {
+  return fetchRSS('https://www.fxstreet.com/rss', 'FXStreet');
+}
+
+// MASTER FETCH — All sources parallel
+async function fetchAllNews() {
+  const feed = document.getElementById('news-feed');
+
+  // Show loading
+  feed.innerHTML = `
+    <div class="loading-card"><div class="skeleton sk-title"></div><div class="skeleton sk-line"></div><div class="skeleton sk-short"></div></div>
+    <div class="loading-card"><div class="skeleton sk-title"></div><div class="skeleton sk-line"></div><div class="skeleton sk-short"></div></div>
+    <div class="loading-card"><div class="skeleton sk-title"></div><div class="skeleton sk-line"></div><div class="skeleton sk-short"></div></div>`;
+
+  try {
+    // Fetch all sources in parallel
+    const [
+      gnews1, gnews2, gnews3,
+      coindesk, marketwatch, reuters, fxstreet, investing
+    ] = await Promise.allSettled([
+      fetchGNews('gold price XAU USD'),
+      fetchGNews('bitcoin BTC ethereum crypto'),
+      fetchGNews('federal reserve inflation CPI dollar'),
+      fetchCoinDesk(),
+      fetchMarketWatch(),
+      fetchReuters(),
+      fetchFXStreet(),
+      fetchInvestingGold(),
+    ]);
+
+    // Combine all results
+    const combined = [
+      ...(gnews1.value || []),
+      ...(gnews2.value || []),
+      ...(gnews3.value || []),
+      ...(coindesk.value || []),
+      ...(marketwatch.value || []),
+      ...(reuters.value || []),
+      ...(fxstreet.value || []),
+      ...(investing.value || []),
+    ];
+
+    // Filter trading relevant only
+    const relevant = combined.filter(a => {
+      const t = (a.title + ' ' + a.description).toLowerCase();
+      return t.includes('gold') || t.includes('bitcoin') || t.includes('btc') ||
+        t.includes('fed') || t.includes('dollar') || t.includes('forex') ||
+        t.includes('inflation') || t.includes('rate') || t.includes('market') ||
+        t.includes('oil') || t.includes('crypto') || t.includes('silver') ||
+        t.includes('eur') || t.includes('gbp') || t.includes('dxy') ||
+        t.includes('trading') || t.includes('economy') || t.includes('stock');
+    });
+
+    // Process + deduplicate
+    const processed = relevant.map((a, i) => ({
+      id: i,
+      title: a.title,
+      description: a.description || '',
+      source: a.source,
+      url: a.url,
+      publishedAt: a.publishedAt || new Date().toISOString(),
+      impact: detectImpact(a.title + ' ' + (a.description || '')),
+      tags: detectTags(a.title + ' ' + (a.description || '')),
+      direction: detectDirection(a.title + ' ' + (a.description || '')),
+    }));
+
+    // Deduplicate by title similarity
+    const seen = new Set();
+    allNews = processed.filter(n => {
+      const key = n.title.slice(0, 40).toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    // Sort by date (newest first)
+    allNews.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+    if (allNews.length > 0) {
+      renderNews();
+      updateAlerts();
+      updateTimestamp(`${allNews.length} articles loaded`);
+    } else {
+      showFallbackNews();
+    }
+
+  } catch(e) {
+    console.log('Fetch error:', e);
+    showFallbackNews();
+  }
 }
 
 function detectImpact(text) {
   const t = text.toLowerCase();
-  const high = ['fed','federal reserve','cpi','inflation','rate decision','fomc','powell','nfp','non-farm','gdp','recession','crash','crisis','war','sanctions','breaking','rate cut','rate hike'];
-  const med = ['gold','bitcoin','btc','rally','surge','drop','fall','rise','bank','ecb','boe','opec','oil'];
+  const high = ['fed','federal reserve','cpi','inflation','rate decision','fomc','powell','nfp','non-farm','gdp','recession','crash','crisis','war','sanctions','breaking','rate cut','rate hike','emergency'];
+  const med = ['gold','bitcoin','btc','rally','surge','drop','fall','rise','bank','ecb','boe','opec','oil','silver','crypto'];
   if (high.some(w => t.includes(w))) return 'high';
   if (med.some(w => t.includes(w))) return 'medium';
   return 'low';
@@ -448,18 +491,18 @@ function detectImpact(text) {
 function detectTags(text) {
   const t = text.toLowerCase();
   const tags = [];
-  if (t.includes('gold') || t.includes('xau') || t.includes('precious')) tags.push('gold');
-  if (t.includes('bitcoin') || t.includes('btc') || t.includes('crypto') || t.includes('ethereum') || t.includes('eth') || t.includes('blockchain')) tags.push('btc');
-  if (t.includes('forex') || t.includes('dollar') || t.includes('eur') || t.includes('gbp') || t.includes('dxy') || t.includes('currency') || t.includes('usd')) tags.push('forex');
-  if (t.includes('fed') || t.includes('cpi') || t.includes('inflation') || t.includes('interest rate') || t.includes('gdp') || t.includes('nfp') || t.includes('fomc')) tags.push('eco');
+  if (t.includes('gold') || t.includes('xau') || t.includes('silver') || t.includes('precious')) tags.push('gold');
+  if (t.includes('bitcoin') || t.includes('btc') || t.includes('crypto') || t.includes('ethereum') || t.includes('eth') || t.includes('blockchain') || t.includes('defi')) tags.push('btc');
+  if (t.includes('forex') || t.includes('dollar') || t.includes('eur') || t.includes('gbp') || t.includes('dxy') || t.includes('currency') || t.includes('usd') || t.includes('yen') || t.includes('fxstreet')) tags.push('forex');
+  if (t.includes('fed') || t.includes('cpi') || t.includes('inflation') || t.includes('interest rate') || t.includes('gdp') || t.includes('nfp') || t.includes('fomc') || t.includes('employment')) tags.push('eco');
   if (tags.length === 0) tags.push('market');
   return tags;
 }
 
 function detectDirection(text) {
   const t = text.toLowerCase();
-  const bull = ['rise','rises','surge','surges','rally','rallies','gain','gains','bullish','soar','climb','jump','up','high','record','boost'];
-  const bear = ['fall','falls','drop','drops','decline','declines','bearish','crash','slump','sink','retreat','down','low','weak','loss'];
+  const bull = ['rise','rises','surge','surges','rally','rallies','gain','gains','bullish','soar','climb','jump','up','high','record','boost','recover','rebound'];
+  const bear = ['fall','falls','drop','drops','decline','declines','bearish','crash','slump','sink','retreat','down','low','weak','loss','sell','selloff'];
   const bc = bull.filter(w => t.includes(w)).length;
   const dc = bear.filter(w => t.includes(w)).length;
   if (bc > dc) return 'bull';
@@ -485,30 +528,30 @@ function renderNews(filter) {
   else if (f === 'high') filtered = allNews.filter(n => n.impact === 'high');
 
   if (filtered.length === 0) {
-    feed.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>No news yet.<br>Refreshing...</p></div>`;
+    feed.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>Is filter mein koi news nahi.<br>Doosra filter try karo.</p></div>`;
     return;
   }
 
-  feed.innerHTML = filtered.slice(0, 25).map((n, i) => {
+  feed.innerHTML = filtered.slice(0, 30).map((n, i) => {
     const assetTags = n.tags.map(t => {
       if (t === 'gold') return `<span class="tag t-gold">🥇 GOLD</span>`;
       if (t === 'btc') return `<span class="tag t-btc">₿ CRYPTO</span>`;
       if (t === 'forex') return `<span class="tag t-forex">💱 FOREX</span>`;
       if (t === 'eco') return `<span class="tag" style="background:rgba(168,85,247,0.15);color:#a855f7">📅 ECO</span>`;
-      return '';
+      return `<span class="tag" style="background:rgba(90,112,128,0.15);color:#4a6070">📊 MARKET</span>`;
     }).join('');
     const impactTag = `<span class="tag t-${n.impact === 'high' ? 'high' : n.impact === 'medium' ? 'med' : 'low'}">${n.impact.toUpperCase()}</span>`;
-    const dirTag = n.direction !== 'neutral' ? `<span class="tag t-${n.direction}">${n.direction === 'bull' ? '▲ BULLISH' : '▼ BEARISH'}</span>` : '';
+    const dirTag = n.direction !== 'neutral' ? `<span class="tag t-${n.direction}">${n.direction === 'bull' ? '▲ BULL' : '▼ BEAR'}</span>` : '';
     const cardClass = n.impact === 'high' ? 'high' : n.tags.includes('btc') ? 'btc-card' : n.impact === 'medium' ? 'medium' : 'low';
 
     return `
-      <div class="news-card ${cardClass}" onclick="toggleCard(this)" style="animation-delay:${Math.min(i*0.04,0.4)}s">
+      <div class="news-card ${cardClass}" onclick="toggleCard(this)" style="animation-delay:${Math.min(i*0.03,0.5)}s">
         <div class="card-top">
           <div class="card-tags">${assetTags}${impactTag}${dirTag}</div>
           <div class="card-time">${timeAgo(n.publishedAt)}</div>
         </div>
         <div class="card-headline">${n.title}</div>
-        <div class="card-desc">${(n.description || '').slice(0,130)}${(n.description||'').length > 130 ? '...' : ''}</div>
+        <div class="card-desc">${(n.description||'').slice(0,120)}${(n.description||'').length>120?'...':''}</div>
         <div class="card-bottom">
           <div class="card-source">📡 ${n.source}</div>
         </div>
@@ -524,14 +567,15 @@ function renderNews(filter) {
 
 function getAnalysis(n) {
   const t = (n.title + ' ' + n.description).toLowerCase();
-  if (t.includes('fed') || t.includes('powell') || t.includes('fomc')) return 'Fed news = <strong>Gold & Dollar ka direct mover</strong>. Hawkish tone = Dollar up, Gold down. Dovish = Gold up. High volatility — news ke 10 min baad trade lo.';
-  if (t.includes('cpi') || t.includes('inflation')) return '<strong>CPI/Inflation</strong> = Gold ka sabse bada catalyst. High inflation = Gold rally. Low inflation = Gold pressure. Trade CPI ke 15 min baad.';
-  if (t.includes('bitcoin') || t.includes('btc') || t.includes('crypto')) return '<strong>BTC/Crypto News</strong>: ETF flows, institutional buying/selling, regulatory news = direct price impact. CoinGlass pe liquidation zones check karo.';
-  if (t.includes('gold') || t.includes('xau')) return '<strong>Gold news</strong>: Central bank demand, safe haven buying, DXY direction dekho. Bearish DXY + bullish gold news = strong buy signal.';
-  if (t.includes('dollar') || t.includes('dxy') || t.includes('usd')) return '<strong>Dollar/DXY news</strong>: DXY up = Gold down, DXY down = Gold up. Classic inverse. EUR/USD aur GBP/USD pe bhi watch karo.';
-  if (t.includes('war') || t.includes('conflict') || t.includes('geopolit')) return '<strong>Geopolitical Risk</strong>: Risk-OFF mode. Gold safe haven demand badhta hai. BTC pe short term pressure possible.';
-  if (t.includes('rate cut') || t.includes('rate hike')) return '<strong>Interest Rate news</strong>: Rate cut = Gold bullish (dollar weakens). Rate hike = Gold bearish. Long term trend setter.';
-  return 'Market sentiment news. Chart structure check karo before trading. ICT levels pe focus rakho.';
+  if (t.includes('fed') || t.includes('powell') || t.includes('fomc')) return 'Fed news = <strong>Gold & Dollar ka direct mover</strong>. Hawkish = Dollar up, Gold down. Dovish = Gold rally. News ke 15 min baad trade lo.';
+  if (t.includes('cpi') || t.includes('inflation')) return '<strong>CPI/Inflation</strong> = Gold ka sabse bada catalyst. High CPI = Gold rally. Low CPI = Gold pressure. Volatility bahut zyada hogi.';
+  if (t.includes('bitcoin') || t.includes('btc') || t.includes('crypto')) return '<strong>BTC/Crypto news</strong>: ETF flows, institutional moves = direct price impact. CoinGlass pe liquidation zones dekho entry ke liye.';
+  if (t.includes('gold') || t.includes('xau') || t.includes('silver')) return '<strong>Gold/Metals news</strong>: Central bank demand, safe haven buying. DXY direction bhi check karo — inverse relationship hai.';
+  if (t.includes('dollar') || t.includes('dxy') || t.includes('usd')) return '<strong>Dollar news</strong>: DXY up = Gold down. DXY down = Gold up. EUR/USD aur GBP/USD pe bhi impact.';
+  if (t.includes('war') || t.includes('conflict') || t.includes('geopolit') || t.includes('sanction')) return '<strong>Geopolitical Risk</strong>: Risk-OFF mode. Gold safe haven demand up. BTC volatile. Positions chhoti rakho.';
+  if (t.includes('rate cut') || t.includes('rate hike')) return '<strong>Interest Rate</strong>: Rate cut = Gold bullish long term. Rate hike = Gold bearish. Major trend setter.';
+  if (t.includes('nfp') || t.includes('employment') || t.includes('jobs')) return '<strong>Jobs Data</strong>: Strong jobs = Dollar strong = Gold weak. Weak jobs = Dollar weak = Gold up. Friday ka biggest event.';
+  return 'Market news. ICT levels check karo — OB aur FVG zones pe focus rakho before trading.';
 }
 
 function toggleCard(card) { card.classList.toggle('open'); }
@@ -545,7 +589,7 @@ function setFilter(filter, btn) {
   renderNews(filter);
 }
 
-// ============ CALENDAR — FCS API ============
+// ============ CALENDAR ============
 async function fetchCalendar() {
   const cal = document.getElementById('cal-content');
   try {
@@ -553,7 +597,6 @@ async function fetchCalendar() {
     const nextWeek = new Date(Date.now() + 7*86400000).toISOString().split('T')[0];
     const res = await fetch(`https://fcsapi.com/api-v3/forex/economic_cal?from=${today}&to=${nextWeek}&access_key=${FCS_KEY}`);
     const data = await res.json();
-
     if (data.response && data.response.length > 0) {
       const byDay = {};
       data.response.forEach(ev => {
@@ -561,33 +604,29 @@ async function fetchCalendar() {
         if (!byDay[day]) byDay[day] = [];
         byDay[day].push(ev);
       });
-
-      cal.innerHTML = Object.entries(byDay).slice(0, 5).map(([day, evs]) => {
+      cal.innerHTML = Object.entries(byDay).slice(0,6).map(([day, evs]) => {
         const items = evs
           .filter(ev => ['High','Medium'].includes(ev.impact))
           .sort((a,b) => (b.impact==='High')-(a.impact==='High'))
           .map(ev => {
             const ic = ev.impact==='High' ? '#ff4757' : '#f0b429';
             const ib = ev.impact==='High' ? 'rgba(255,71,87,0.15)' : 'rgba(240,180,41,0.12)';
-            const ist = convertToIST(ev.date);
             return `<div class="cal-item">
-              <div class="cal-time">${ist}</div>
+              <div class="cal-time">${convertToIST(ev.date)}</div>
               <div class="cal-dot" style="background:${ic}"></div>
               <div class="cal-info">
-                <div class="cal-name">${ev.event||ev.name||'Economic Event'}</div>
-                <div class="cal-curr">${ev.country||ev.currency||''} ${ev.forecast?'• F: '+ev.forecast:''} ${ev.actual?'• A: '+ev.actual:''}</div>
+                <div class="cal-name">${ev.event||'Economic Event'}</div>
+                <div class="cal-curr">${ev.country||ev.currency||''} ${ev.forecast?'• F:'+ev.forecast:''} ${ev.actual?'• A:'+ev.actual:''}</div>
               </div>
-              <div class="cal-impact" style="background:${ib};color:${ic};font-size:9px;padding:2px 7px;border-radius:4px;font-family:'Space Mono',monospace;font-weight:700">${ev.impact||'LOW'}</div>
+              <div class="cal-impact" style="background:${ib};color:${ic};font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700">${ev.impact}</div>
             </div>`;
           }).join('');
         return `<div class="cal-day"><div class="cal-day-title">${formatDay(day)}</div>${items||'<div style="font-size:11px;color:var(--muted);padding:6px">No high impact events</div>'}</div>`;
       }).join('');
     } else {
-      cal.innerHTML = renderFallbackCalendar();
+      cal.innerHTML = fallbackCalendar();
     }
-  } catch(e) {
-    cal.innerHTML = renderFallbackCalendar();
-  }
+  } catch(e) { cal.innerHTML = fallbackCalendar(); }
 }
 
 function convertToIST(dateStr) {
@@ -602,20 +641,19 @@ function convertToIST(dateStr) {
 function formatDay(dateStr) {
   try {
     const d = new Date(dateStr);
-    const today = new Date();
-    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+    const today = new Date(); const tom = new Date(today); tom.setDate(tom.getDate()+1);
     if (d.toDateString()===today.toDateString()) return '📅 TODAY';
-    if (d.toDateString()===tomorrow.toDateString()) return '📅 TOMORROW';
-    return '📅 ' + d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short'}).toUpperCase();
+    if (d.toDateString()===tom.toDateString()) return '📅 TOMORROW';
+    return '📅 '+d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short'}).toUpperCase();
   } catch(e) { return '📅 '+dateStr; }
 }
 
-function renderFallbackCalendar() {
-  return `
-  <div class="cal-day"><div class="cal-day-title">📅 THIS WEEK</div>
-  <div class="cal-item"><div class="cal-time">18:30 IST</div><div class="cal-dot" style="background:#ff4757"></div><div class="cal-info"><div class="cal-name">Fed Chair Powell Speech</div><div class="cal-curr">USD • Watch Gold & Dollar</div></div><div class="cal-impact" style="background:rgba(255,71,87,0.15);color:#ff4757;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700">HIGH</div></div>
-  <div class="cal-item"><div class="cal-time">18:00 IST</div><div class="cal-dot" style="background:#ff4757"></div><div class="cal-info"><div class="cal-name">US CPI — Inflation Data 🔥</div><div class="cal-curr">USD • Gold ka biggest mover</div></div><div class="cal-impact" style="background:rgba(255,71,87,0.15);color:#ff4757;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700">HIGH</div></div>
-  <div class="cal-item"><div class="cal-time">18:30 IST</div><div class="cal-dot" style="background:#ff4757"></div><div class="cal-info"><div class="cal-name">NFP — Non Farm Payroll 🔥🔥</div><div class="cal-curr">USD • Friday weekly mover</div></div><div class="cal-impact" style="background:rgba(255,71,87,0.15);color:#ff4757;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700">HIGH</div></div>
+function fallbackCalendar() {
+  return `<div class="cal-day"><div class="cal-day-title">📅 THIS WEEK — Key Events</div>
+  <div class="cal-item"><div class="cal-time">18:30 IST</div><div class="cal-dot" style="background:#ff4757"></div><div class="cal-info"><div class="cal-name">Fed Chair Powell Speech 🔥</div><div class="cal-curr">USD • Gold + Dollar volatile</div></div><div class="cal-impact" style="background:rgba(255,71,87,0.15);color:#ff4757;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700">HIGH</div></div>
+  <div class="cal-item"><div class="cal-time">18:00 IST</div><div class="cal-dot" style="background:#ff4757"></div><div class="cal-info"><div class="cal-name">US CPI Inflation Data 🔥🔥</div><div class="cal-curr">USD • Gold ka sabse bada mover</div></div><div class="cal-impact" style="background:rgba(255,71,87,0.15);color:#ff4757;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700">HIGH</div></div>
+  <div class="cal-item"><div class="cal-time">18:30 IST</div><div class="cal-dot" style="background:#ff4757"></div><div class="cal-info"><div class="cal-name">NFP — Non Farm Payroll 🔥🔥🔥</div><div class="cal-curr">USD • Biggest weekly mover</div></div><div class="cal-impact" style="background:rgba(255,71,87,0.15);color:#ff4757;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700">HIGH</div></div>
+  <div class="cal-item"><div class="cal-time">17:30 IST</div><div class="cal-dot" style="background:#f0b429"></div><div class="cal-info"><div class="cal-name">ECB Rate Decision</div><div class="cal-curr">EUR • EUR/USD big move</div></div><div class="cal-impact" style="background:rgba(240,180,41,0.12);color:#f0b429;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700">MED</div></div>
   </div>`;
 }
 
@@ -629,41 +667,30 @@ function updateAlerts() {
         <div style="font-size:10px;color:var(--bear);font-family:'Space Mono',monospace;margin-bottom:4px">🚨 HIGH IMPACT • ${timeAgo(n.publishedAt)}</div>
         <div style="font-size:13px;font-weight:600;margin-bottom:4px">${n.title}</div>
         <div style="font-size:11px;color:var(--muted)">${n.source}</div>
+        <a href="${n.url}" target="_blank" style="font-size:11px;color:var(--blue)">Read →</a>
       </div>`).join('');
   }
 }
 
 function showFallbackNews() {
   document.getElementById('news-feed').innerHTML = `
-    <div class="error-box"><p>⚠️ News load ho rahi hai...</p><small>GNews API se fetch ho raha hai. Thoda wait karo ya Refresh karo.</small></div>
-    <div class="news-card medium" onclick="toggleCard(this)">
-      <div class="card-top"><div class="card-tags"><span class="tag t-gold">🥇 GOLD</span><span class="tag t-high">HIGH</span></div><div class="card-time">Demo</div></div>
-      <div class="card-headline">Gold holds near record highs on Fed uncertainty</div>
-      <div class="card-desc">Gold prices remain elevated as markets await clarity on Federal Reserve rate path.</div>
-      <div class="card-bottom"><div class="card-source">📡 Market Watch</div></div>
-      <div class="card-expand"><div class="analysis-box"><strong>Trading Note:</strong> DXY direction critical. Bearish DXY = Gold buy opportunities on OB pullbacks.</div></div>
-    </div>
-    <div class="news-card btc-card" onclick="toggleCard(this)">
-      <div class="card-top"><div class="card-tags"><span class="tag t-btc">₿ CRYPTO</span><span class="tag t-med">MEDIUM</span></div><div class="card-time">Demo</div></div>
-      <div class="card-headline">Bitcoin ETF inflows support price above key level</div>
-      <div class="card-desc">Institutional demand via ETFs continues to provide price support for Bitcoin.</div>
-      <div class="card-bottom"><div class="card-source">📡 CoinDesk</div></div>
-      <div class="card-expand"><div class="analysis-box"><strong>Trading Note:</strong> SSL grab zone watch kar. Liquidity grab ke baad long entry opportunity.</div></div>
-    </div>`;
-  updateTimestamp();
+    <div class="error-box"><p>⚠️ RSS sources load nahi hui</p><small>Refresh karo — RSS2JSON service se retry hoga.</small></div>`;
+  updateTimestamp('Retrying...');
+  setTimeout(fetchAllNews, 5000);
 }
 
-function updateTimestamp() {
+function updateTimestamp(extra) {
   const now = new Date();
-  document.getElementById('last-update').textContent = 'Updated: ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('last-update').textContent = `Updated: ${now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}${extra ? ' • '+extra : ''}`;
 }
 
 async function refreshAll() {
   const icon = document.getElementById('ref-icon');
-  icon.style.animation = 'spinIt 0.6s linear';
-  setTimeout(() => icon.style.animation = '', 700);
+  icon.style.transition = 'transform 0.6s';
+  icon.style.transform = 'rotate(360deg)';
+  setTimeout(() => { icon.style.transform = 'rotate(0deg)'; }, 700);
   await fetchPrices();
-  await fetchNews();
+  await fetchAllNews();
 }
 
 function switchView(view, navItem) {
@@ -676,31 +703,26 @@ function switchView(view, navItem) {
 
 // ============ INIT ============
 fetchPrices();
-fetchAllTopics();
+fetchAllNews();
 
-setInterval(fetchPrices, 30000);
-setInterval(fetchNews, 90000);
+// Auto refresh
+setInterval(fetchPrices, 30000);       // Prices: 30 sec
+setInterval(fetchAllNews, 120000);     // News: 2 min
 
-// SW Registration
+// SW
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(e => {});
-  });
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
 
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
   const btn = document.getElementById('install-btn');
   if (btn) btn.style.display = 'flex';
 });
 
 function installApp() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-  }
+  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; }); }
 }
 
 </script>
