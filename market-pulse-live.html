@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Pulse — Live</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f0b429">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MarketPulse">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="MarketPulse">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #060a10;
+    --bg2: #0a1018;
+    --bg3: #0f1820;
+    --border: #182030;
+    --gold: #f0b429;
+    --gold2: #ffd166;
+    --btc: #f7931a;
+    --bull: #00d084;
+    --bear: #ff4757;
+    --blue: #3d9eff;
+    --purple: #a855f7;
+    --text: #e2e8f0;
+    --muted: #4a6070;
+    --card: #0c1520;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Space Grotesk', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  /* TICKER */
+  .ticker-wrap { background: #050810; border-bottom: 1px solid var(--border); overflow: hidden; height: 30px; display: flex; align-items: center; }
+  .ticker-label { background: var(--gold); color: #000; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; padding: 0 10px; height: 100%; display: flex; align-items: center; flex-shrink: 0; letter-spacing: 1px; }
+  .ticker-scroll { overflow: hidden; flex: 1; }
+  .ticker-track { display: flex; animation: ticker 35s linear infinite; white-space: nowrap; }
+  .ticker-item { font-family: 'Space Mono', monospace; font-size: 10px; padding: 0 20px; display: flex; align-items: center; gap: 6px; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* HEADER */
+  .header { background: linear-gradient(180deg, #0a1520 0%, var(--bg) 100%); border-bottom: 1px solid var(--border); padding: 12px 16px; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .logo { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; background: linear-gradient(90deg, var(--gold), var(--btc)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .live-badge { display: flex; align-items: center; gap: 5px; background: rgba(0,208,132,0.1); border: 1px solid rgba(0,208,132,0.3); border-radius: 20px; padding: 4px 10px; font-size: 10px; font-family: 'Space Mono', monospace; color: var(--bull); }
+  .live-dot { width: 5px; height: 5px; background: var(--bull); border-radius: 50%; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.3; transform:scale(0.7); } }
+
+  /* MARKET CARDS */
+  .markets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 0; }
+  .mcard { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px; position: relative; overflow: hidden; }
+  .mcard::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .mcard.gold::before { background: var(--gold); }
+  .mcard.btc::before { background: var(--btc); }
+  .mcard.dxy::before { background: var(--blue); }
+  .mcard-name { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; margin-bottom: 3px; }
+  .mcard-price { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .mcard-change { font-size: 10px; font-family: 'Space Mono', monospace; font-weight: 600; }
+  .mcard-loading { color: var(--muted); font-size: 10px; animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* FILTER */
+  .filter-bar { display: flex; gap: 6px; padding: 10px 16px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); background: var(--bg2); }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .fbtn { flex-shrink: 0; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 10px; font-weight: 600; cursor: pointer; font-family: 'Space Grotesk', sans-serif; transition: all 0.2s; }
+  .fbtn.active { background: rgba(240,180,41,0.15); color: var(--gold); border-color: var(--gold); }
+  .fbtn.active-btc { background: rgba(247,147,26,0.15); color: var(--btc); border-color: var(--btc); }
+  .fbtn.active-high { background: rgba(255,71,87,0.15); color: var(--bear); border-color: var(--bear); }
+  .fbtn.active-cal { background: rgba(168,85,247,0.15); color: var(--purple); border-color: var(--purple); }
+
+  /* FEED */
+  .feed-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 6px; }
+  .feed-title { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+  .last-update { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .refresh-btn { display: flex; align-items: center; gap: 5px; background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 10px; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: 'Space Grotesk', sans-serif; transition: all 0.2s; }
+  .refresh-btn:hover { color: var(--gold); border-color: var(--gold); }
+  .spin { animation: spinIt 0.6s linear; }
+  @keyframes spinIt { to { transform: rotate(360deg); } }
+
+  /* NEWS CARDS */
+  .news-feed { padding: 0 16px 100px; }
+  .news-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; animation: fadeUp 0.3s ease forwards; opacity: 0; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .news-card:active { transform: scale(0.99); }
+  .news-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: 3px 0 0 3px; }
+  .news-card.high::before { background: var(--bear); }
+  .news-card.medium::before { background: var(--gold); }
+  .news-card.low::before { background: var(--muted); }
+  .news-card.btc-card::before { background: var(--btc); }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .card-tags { display: flex; gap: 4px; flex-wrap: wrap; flex: 1; }
+  .tag { font-size: 9px; padding: 2px 7px; border-radius: 4px; font-family: 'Space Mono', monospace; font-weight: 700; }
+  .t-gold { background: rgba(240,180,41,0.15); color: var(--gold); }
+  .t-btc { background: rgba(247,147,26,0.15); color: var(--btc); }
+  .t-forex { background: rgba(61,158,255,0.15); color: var(--blue); }
+  .t-high { background: rgba(255,71,87,0.15); color: var(--bear); }
+  .t-med { background: rgba(240,180,41,0.12); color: var(--gold); }
+  .t-low { background: rgba(90,112,128,0.15); color: var(--muted); }
+  .t-bull { background: rgba(0,208,132,0.15); color: var(--bull); }
+  .t-bear { background: rgba(255,71,87,0.15); color: var(--bear); }
+  .card-time { font-size: 9px; color: var(--muted); font-family: 'Space Mono', monospace; flex-shrink: 0; }
+  .card-headline { font-size: 13px; font-weight: 600; line-height: 1.5; margin-bottom: 6px; }
+  .card-desc { font-size: 11px; color: #6a8090; line-height: 1.6; margin-bottom: 8px; }
+  .card-bottom { display: flex; justify-content: space-between; align-items: center; }
+  .card-source { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .card-expand { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .news-card.open .card-expand { display: block; }
+  .analysis-box { background: rgba(240,180,41,0.05); border: 1px solid rgba(240,180,41,0.15); border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #9ab0c0; line-height: 1.7; }
+  .analysis-box strong { color: var(--gold2); }
+  .read-more { display: inline-block; margin-top: 8px; font-size: 11px; color: var(--blue); text-decoration: none; }
+
+  /* CALENDAR */
+  .cal-section { padding: 12px 16px 100px; display: none; }
+  .cal-section.active { display: block; }
+  .cal-day { margin-bottom: 18px; }
+  .cal-day-title { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--gold); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
+  .cal-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+  .cal-time { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); width: 52px; flex-shrink: 0; }
+  .cal-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cal-info { flex: 1; }
+  .cal-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+  .cal-curr { font-size: 10px; color: var(--muted); }
+  .cal-impact { font-size: 9px; padding: 2px 7px; border-radius: 4px; font-family: 'Space Mono', monospace; font-weight: 700; flex-shrink: 0; }
+
+  /* LOADING STATE */
+  .loading-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+  .skeleton { background: linear-gradient(90deg, var(--border) 25%, #1e3045 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .sk-line { height: 10px; margin-bottom: 8px; }
+  .sk-title { height: 14px; width: 85%; margin-bottom: 10px; }
+  .sk-short { height: 10px; width: 40%; }
+
+  /* ERROR STATE */
+  .error-box { background: rgba(255,71,87,0.06); border: 1px solid rgba(255,71,87,0.2); border-radius: 10px; padding: 16px; text-align: center; margin: 12px 0; }
+  .error-box p { font-size: 12px; color: var(--bear); margin-bottom: 6px; }
+  .error-box small { font-size: 10px; color: var(--muted); }
+
+  /* BOTTOM NAV */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 1px solid var(--border); display: flex; padding: 6px 0 8px; z-index: 100; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px; }
+  .nav-icon { font-size: 18px; }
+  .nav-label { font-size: 9px; color: var(--muted); font-weight: 600; }
+  .nav-item.active .nav-label { color: var(--gold); }
+
+  /* NOTIF DOT */
+  .ndot-wrap { position: relative; display: inline-block; }
+  .ndot { position: absolute; top: -2px; right: -2px; width: 7px; height: 7px; background: var(--bear); border-radius: 50%; border: 2px solid var(--bg2); }
+
+  /* VIEWS */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .empty-icon { font-size: 32px; margin-bottom: 8px; }
+  .empty p { font-size: 12px; }
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-label">LIVE</div>
+  <div class="ticker-scroll">
+    <div class="ticker-track" id="ticker-track">
+      <span class="ticker-item" style="color:var(--gold)">🥇 GOLD <span id="tk-gold">loading...</span></span>
+      <span class="ticker-item" style="color:var(--btc)">₿ BTC <span id="tk-btc">loading...</span></span>
+      <span class="ticker-item" style="color:var(--blue)">💱 EUR/USD <span id="tk-eur">loading...</span></span>
+      <span class="ticker-item" style="color:var(--text)">💱 GBP/USD <span id="tk-gbp">loading...</span></span>
+      <span class="ticker-item" style="color:var(--gold)">🥇 GOLD <span id="tk-gold2">loading...</span></span>
+      <span class="ticker-item" style="color:var(--btc)">₿ BTC <span id="tk-btc2">loading...</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW: MAIN NEWS -->
+<div id="view-news" class="view active">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">⚡ MARKET PULSE</div>
+      <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+      <button id="install-btn" onclick="installApp()" style="display:none;align-items:center;gap:5px;background:rgba(240,180,41,0.15);border:1px solid var(--gold);border-radius:20px;padding:5px 12px;color:var(--gold);font-size:10px;font-family:Space Grotesk,sans-serif;font-weight:600;cursor:pointer;">⬇️ Install App</button>
+    </div>
+    <div class="markets">
+      <div class="mcard gold">
+        <div class="mcard-name">GOLD</div>
+        <div class="mcard-price" style="color:var(--gold)" id="gold-price"><span class="mcard-loading">···</span></div>
+        <div class="mcard-change" id="gold-chg"><span class="mcard-loading" style="font-size:9px">fetching</span></div>
+      </div>
+      <div class="mcard btc">
+        <div class="mcard-name">BTC/USD</div>
+        <div class="mcard-price" style="color:var(--btc)" id="btc-price"><span class="mcard-loading">···</span></div>
+        <div class="mcard-change" id="btc-chg"><span class="mcard-loading" style="font-size:9px">fetching</span></div>
+      </div>
+      <div class="mcard dxy">
+        <div class="mcard-name">ETH/USD</div>
+        <div class="mcard-price" style="color:var(--blue)" id="eth-price"><span class="mcard-loading">···</span></div>
+        <div class="mcard-change" id="eth-chg"><span class="mcard-loading" style="font-size:9px">fetching</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="fbtn active" id="fb-all" onclick="setFilter('all',this)">🌐 All</button>
+    <button class="fbtn" id="fb-gold" onclick="setFilter('gold',this)">🥇 Gold</button>
+    <button class="fbtn" id="fb-btc" onclick="setFilter('btc',this)">₿ Crypto</button>
+    <button class="fbtn" id="fb-forex" onclick="setFilter('forex',this)">💱 Forex</button>
+    <button class="fbtn" id="fb-high" onclick="setFilter('high',this)">🔴 High Impact</button>
+  </div>
+
+  <div class="feed-header">
+    <div>
+      <div class="feed-title">Live News Feed</div>
+      <div class="last-update" id="last-update">Updating...</div>
+    </div>
+    <button class="refresh-btn" onclick="refreshAll()">
+      <span id="ref-icon" style="display:inline-block">↻</span> Refresh
+    </button>
+  </div>
+
+  <div class="news-feed" id="news-feed">
+    <!-- Loading skeletons -->
+    <div class="loading-card"><div class="skeleton sk-title"></div><div class="skeleton sk-line"></div><div class="skeleton sk-line" style="width:70%"></div><div class="skeleton sk-short"></div></div>
+    <div class="loading-card"><div class="skeleton sk-title"></div><div class="skeleton sk-line"></div><div class="skeleton sk-line" style="width:60%"></div><div class="skeleton sk-short"></div></div>
+    <div class="loading-card"><div class="skeleton sk-title"></div><div class="skeleton sk-line"></div><div class="skeleton sk-short"></div></div>
+  </div>
+</div>
+
+<!-- VIEW: CALENDAR -->
+<div id="view-calendar" class="view">
+  <div style="padding:12px 16px 0">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--purple);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px">📅 Economic Calendar</div>
+  </div>
+  <div class="cal-section active" id="cal-content">
+    <div style="text-align:center;padding:30px;color:var(--muted)"><div style="font-size:24px;margin-bottom:8px">⏳</div><p style="font-size:12px">Loading calendar...</p></div>
+  </div>
+</div>
+
+<!-- VIEW: ALERTS -->
+<div id="view-alerts" class="view">
+  <div style="padding:16px 16px 100px">
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px">Alert Log</div>
+    <div id="alert-log">
+      <div style="text-align:center;padding:30px;color:var(--muted)"><div style="font-size:24px;margin-bottom:8px">🔔</div><p style="font-size:12px">No alerts yet.<br>High impact news will appear here.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="switchView('news',this)">
+    <span class="nav-icon">📰</span>
+    <span class="nav-label">News</span>
+  </div>
+  <div class="nav-item" onclick="switchView('calendar',this)">
+    <span class="nav-icon">📅</span>
+    <span class="nav-label">Calendar</span>
+  </div>
+  <div class="nav-item" onclick="switchView('alerts',this)">
+    <span class="nav-icon">
+      <span class="ndot-wrap">🔔<span class="ndot" id="alert-dot" style="display:none"></span></span>
+    </span>
+    <span class="nav-label">Alerts</span>
+  </div>
+</div>
+
+<script>
+// ============ CONFIG ============
+const NEWSAPI_KEY = 'e4bdfc218e9d47b8b69e6e27ba95905b';
+const COINGECKO_KEY = 'CG-uKSWDEbhEH96DkRFAFX1EwLa';
+const FCS_KEY = 'Fd1u02QCNfopPM5FEkcjl6EC15CNKAWvS';
+
+let allNews = [];
+let currentFilter = 'all';
+let alertLog = [];
+
+// ============ PRICES — CoinGecko ============
+async function fetchPrices() {
+  try {
+    const res = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,gold&vs_currencies=usd&include_24hr_change=true&x_cg_demo_api_key=${COINGECKO_KEY}`
+    );
+    const data = await res.json();
+
+    if (data.bitcoin) {
+      const btc = data.bitcoin;
+      const chgColor = btc.usd_24h_change >= 0 ? '#00d084' : '#ff4757';
+      const chgArrow = btc.usd_24h_change >= 0 ? '▲' : '▼';
+      document.getElementById('btc-price').textContent = '$' + btc.usd.toLocaleString();
+      document.getElementById('btc-chg').innerHTML = `<span style="color:${chgColor}">${chgArrow} ${Math.abs(btc.usd_24h_change).toFixed(2)}%</span>`;
+      const tkVal = `<span style="color:${chgColor}">${chgArrow}${Math.abs(btc.usd_24h_change).toFixed(1)}%</span> $${btc.usd.toLocaleString()}`;
+      document.getElementById('tk-btc').innerHTML = tkVal;
+      document.getElementById('tk-btc2').innerHTML = tkVal;
+    }
+
+    if (data.ethereum) {
+      const eth = data.ethereum;
+      const chgColor = eth.usd_24h_change >= 0 ? '#00d084' : '#ff4757';
+      const chgArrow = eth.usd_24h_change >= 0 ? '▲' : '▼';
+      document.getElementById('eth-price').textContent = '$' + eth.usd.toLocaleString();
+      document.getElementById('eth-chg').innerHTML = `<span style="color:${chgColor}">${chgArrow} ${Math.abs(eth.usd_24h_change).toFixed(2)}%</span>`;
+    }
+
+    // Gold via FCS API
+    fetchGoldPrice();
+
+  } catch (e) {
+    console.log('CoinGecko error:', e);
+    fetchGoldPrice();
+  }
+}
+
+async function fetchGoldPrice() {
+  try {
+    const res = await fetch(`https://fcsapi.com/api-v3/forex/latest?symbol=XAU/USD&access_key=${FCS_KEY}`);
+    const data = await res.json();
+    if (data.response && data.response.length > 0) {
+      const gold = data.response[0];
+      const price = parseFloat(gold.c).toFixed(2);
+      const chg = parseFloat(gold.cp);
+      const chgColor = chg >= 0 ? '#00d084' : '#ff4757';
+      const chgArrow = chg >= 0 ? '▲' : '▼';
+      document.getElementById('gold-price').textContent = '$' + parseFloat(price).toLocaleString();
+      document.getElementById('gold-chg').innerHTML = `<span style="color:${chgColor}">${chgArrow} ${Math.abs(chg).toFixed(2)}%</span>`;
+      const tkGold = `<span style="color:${chgColor}">${chgArrow}${Math.abs(chg).toFixed(1)}%</span> $${parseFloat(price).toLocaleString()}`;
+      document.getElementById('tk-gold').innerHTML = tkGold;
+      document.getElementById('tk-gold2').innerHTML = tkGold;
+    }
+
+    // Also fetch EUR/USD and GBP/USD
+    fetchForexRates();
+  } catch(e) {
+    console.log('FCS gold error:', e);
+    fetchForexRates();
+  }
+}
+
+async function fetchForexRates() {
+  try {
+    const res = await fetch(`https://fcsapi.com/api
